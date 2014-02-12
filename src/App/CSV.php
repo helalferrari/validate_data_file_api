@@ -6,15 +6,35 @@ class CSV {
   private $data;
   private $file_csv_name;
   private $destination_path;
+  private $delimiter;
+  private $enclosure;
 
   public function __construct() {
 
     $this->setFileCSVName('result');
     $this->setData(array());
+    $this->setDelimiter(';');
+    $this->setEnclosure('"');
+  }
+
+  public function setDelimiter($delimiter) {
+    $this->delimiter = $delimiter;
+  }
+
+  public function setEnclosure($enclosure) {
+    $this->enclosure = $enclosure;
   }
 
   public function setDestinationPath($path) {
     $this->destination_path = $path;
+  }
+
+  public function getDelimiter($delimiter) {
+    return $this->delimiter;
+  }
+
+  public function getEnclosure($enclosure) {
+    return $this->enclosure;
   }
 
   public function getDestinationPath() {
@@ -95,7 +115,7 @@ class CSV {
     $data = array();
     $header = array();
     $counter = 0;
-    while (($line = fgetcsv($handle, 0, ";")) !== FALSE) {
+    while (($line = fgetcsv($handle, 0, $this->getDelimiter(), $this->getEnclosure())) !== FALSE) {
       foreach ($line as $key => $column_value) {
         if ($counter == 0) {
           $header[] = $column_value;
