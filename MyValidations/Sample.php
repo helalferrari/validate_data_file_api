@@ -14,6 +14,8 @@ class Sample extends InitValidator{
     $this->setRedirectPath('index.php');
     $this->setSpreadSheetModelPath('../public/files/model.csv');
     $this->csv->setFileCSVName('sample');
+    $this->csv->setDelimiter(';');
+    //$this->csv->setEnclosure('"');
 
     // Columns's name
     $this->setColumns(array(

@@ -14,7 +14,7 @@ class CSV {
     $this->setFileCSVName('result');
     $this->setData(array());
     $this->setDelimiter(';');
-    $this->setEnclosure('"');
+    $this->setEnclosure(NULL);
   }
 
   public function setDelimiter($delimiter) {
@@ -29,11 +29,11 @@ class CSV {
     $this->destination_path = $path;
   }
 
-  public function getDelimiter($delimiter) {
+  public function getDelimiter() {
     return $this->delimiter;
   }
 
-  public function getEnclosure($enclosure) {
+  public function getEnclosure() {
     return $this->enclosure;
   }
 
@@ -67,9 +67,15 @@ class CSV {
 
     // Formatting to csv
     if (count($data) > 1) {
+      $enclosure = $this->getEnclosure();
       foreach($data as $line) {
         if (is_array($line)) {
-          $lines[] = utf8_decode(implode(';', $line));
+          if (empty($enclosure)) {
+            $lines[] = utf8_decode(implode($this->getDelimiter(), $line));
+          }
+          else {
+            $lines[] = utf8_decode($enclosure . implode($enclosure . $this->getDelimiter() . $enclosure, $line) . $enclosure);
+          }
         }
         // For $data errors msg doesn't need imploded
         else {
@@ -115,7 +121,12 @@ class CSV {
     $data = array();
     $header = array();
     $counter = 0;
-    while (($line = fgetcsv($handle, 0, $this->getDelimiter(), $this->getEnclosure())) !== FALSE) {
+    $fgetcsv_params = array($handle, 0, $this->getDelimiter());
+    $enclosure = $this->getEnclosure();
+    if (!empty($enclosure)) {
+      $fgetcsv_params[] = $enclosure;
+    }
+    while (($line = call_user_func_array('fgetcsv', $fgetcsv_params)) !== FALSE) {
       foreach ($line as $key => $column_value) {
         if ($counter == 0) {
           $header[] = $column_value;
