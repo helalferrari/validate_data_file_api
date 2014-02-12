@@ -1,0 +1,5 @@
+Line error on, Column, Message
+4, E-mail, This field is mandatory.
+5, CPF, Invalid CPF.
+5, CNPJ, Invalid CNPJ.
+5, E-mail, There was a repetition of this value: test3@test3.com.br. On line 4.
