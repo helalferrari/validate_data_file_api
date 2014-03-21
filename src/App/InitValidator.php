@@ -4,12 +4,13 @@ namespace App;
 class InitValidator {
   private $columns;
   private $map_validations;
-  private $validator;
   private $import_path;
   private $file_path;
   //private $converterXSLtoArray;
   private $redirect_path;
   private $spread_sheet_model_path;
+
+  protected $validator;
 
   public $csv;
   public $message;
@@ -56,13 +57,14 @@ class InitValidator {
     //$this->converterXSLtoArray->convert();
     // Saving data in an array
     //$data = $this->converterXSLtoArray->getData();
+
     $this->csv->getCSVFile($this->csv->openCSVFile($this->getFilePath()));
     $data = $this->csv->getData();
 
     // Starting Validation
     $errors = $this->validator->startValidation($this->getColumns(), $data,
     $this->getMapValidations(), $this->getRedirectPath(),
-    $this->spread_sheet_model_path);
+    $this->getSpreadSheetModelPath());
 
     // CSV configuration
     $this->csv->setDestinationPath($this->getImportPath());
@@ -70,14 +72,15 @@ class InitValidator {
     // Another csv file to report some problems could having happened
     // case not return null
     if (!empty($errors)) {
+      $csvErrorsContent = $this->csv->prepareContentCSV($errors);
       $prefix_error_name = 'errors_';
-      $error_file_path = $this->csv->getDestinationPath() . $prefix_error_name . $this->csv->getFileCSVName();
       $this->message->set(sprintf('Some problems were found, please check this <a href="%s">report</a>.',
-        $this->csv->writeCSVFile($errors, $prefix_error_name)), 'warning');
+        $this->csv->writeFile($csvErrorsContent, $prefix_error_name)), 'warning');
     }
 
+    $csvContent = $this->csv->prepareContentCSV($data);
     // CSV ready to import in the migrate Module
-    $this->message->set(sprintf('After validation has generated a new file with only the correct lines. <a href="%s">Download</a>.', $this->csv->writeCSVFile($data)), 'status');
+    $this->message->set(sprintf('After validation was generated a new file with only the correct lines. <a href="%s">Download</a>.', $this->csv->writeFile($csvContent)), 'status');
   }
 
   public function setColumns($columns) {

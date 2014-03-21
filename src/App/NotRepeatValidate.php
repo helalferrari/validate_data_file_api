@@ -27,6 +27,7 @@ class NotRepeatValidate {
     $container['notrepeat'][$header_name][] = $value;
     return array(
       'status' => TRUE,
+      'value' => $value,
     );
   }
 }

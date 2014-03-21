@@ -58,45 +58,57 @@ class CSV {
   }
 
   /**
-   * Save a CSV File with fopen.
+   * Transform the array in the csv lines format.
    */
-  public function writeCSVFile($data, $file_name = NULL) {
+  public function prepareContentCSV($data, $errors = FALSE) {
     if (empty($data)) {
       return NULL;
     }
-
     // Formatting to csv
     if (count($data) > 1) {
-      $enclosure = $this->getEnclosure();
-      foreach($data as $line) {
-        if (is_array($line)) {
-          if (empty($enclosure)) {
-            $lines[] = utf8_decode(implode($this->getDelimiter(), $line));
+      if (!$errors) {
+        $enclosure = $this->getEnclosure();
+        foreach($data as $line) {
+          if (is_array($line)) {
+            if (empty($enclosure)) {
+              $lines[] = utf8_decode(implode($this->getDelimiter(), $line));
+            }
+            else {
+              $lines[] = utf8_decode($enclosure . implode($enclosure . $this->getDelimiter() . $enclosure, $line) . $enclosure);
+            }
           }
+          // For $data errors msg doesn't need imploded
           else {
-            $lines[] = utf8_decode($enclosure . implode($enclosure . $this->getDelimiter() . $enclosure, $line) . $enclosure);
+            $lines[] = utf8_decode($line);
           }
-        }
-        // For $data errors msg doesn't need imploded
-        else {
-          $lines[] = utf8_decode($line);
         }
       }
+      else {
+        $lines = $data;
+      }
+
       // Last formatting
       $csv_content = implode("\n", $lines);
     }
     else {
       $csv_content = utf8_decode(current($data));
     }
+    return $csv_content;
+  }
 
-    if ($file_name == NULL) {
-      $file_path = $this->getDestinationPath() . $this->file_csv_name;
+  /**
+   * Write file in the csv extension
+   */
+  public function writeFile($content, $prefix_name = NULL) {
+    if ($prefix_name == NULL) {
+      $file_path = $this->getDestinationPath() . $prefix_name . $this->file_csv_name;
     }
     else {
-      $file_path = $this->getDestinationPath() . $file_name . $this->file_csv_name;
+      $file_path = $this->getDestinationPath() . $prefix_name . $this->file_csv_name;
     }
+
     $fp = fopen($file_path, "w");
-    fwrite($fp, $csv_content);
+    fwrite($fp, $content);
     fclose($fp);
     return $file_path;
   }

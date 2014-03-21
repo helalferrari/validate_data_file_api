@@ -14,6 +14,7 @@ class NotNullValidate {
     }
     return array(
       'status' => TRUE,
+      'value' => $value,
     );
   }
 }

@@ -2,16 +2,26 @@
 namespace App;
 
 class CNPJ {
+  private $utils;
+
+  public function __construct() {
+    $this->utils = new Utils();
+  }
 
   /**
    * Validate cnpj.
    */
   public function validate($value) {
+
     // Check if this value contains 14 digits
+    if (strlen((string) $value) < 14) {
+      $value = $this->utils->completeWithZero($value, 14);
+    }
+
     if (!$this->cnpjValidator($value)) {
       return array(
         'status' => FALSE,
-        'type' => 'cpf',
+        'type' => 'cnpj',
         'type_error' => 'invalid cnpj',
         'msg' => sprintf('Invalid CNPJ.'),
       );
@@ -19,6 +29,7 @@ class CNPJ {
 
     return array(
       'status' => TRUE,
+      'value' => $value,
     );
   }
 
@@ -27,6 +38,15 @@ class CNPJ {
     if(strlen($cnpj) <> 14){
         return false;
     }
+
+    $ignore_list = array(
+      '00000000000000',
+    );
+
+    if(strlen($cnpj) != 14 || in_array($cnpj, $ignore_list)){
+        return false;
+    }
+
     $calcular = 0;
     $calcularDois = 0;
     for ($i = 0, $x = 5; $i <= 11; $i++, $x--) {

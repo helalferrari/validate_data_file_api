@@ -26,13 +26,17 @@ class Validator {
     return $this->invalid_lines;
   }
 
+  public function setInvalidLines($invalid_lines) {
+    $this->invalid_lines = $invalid_lines;
+  }
+
   /**
    * [validate description]
    * @param  array  $data [description]
    * @param  array  $map  [description]
    * @return [type]       [description]
    */
-  private function validate(array &$data, array $map_validations) {
+  protected function validate(array &$data, array $map_validations) {
     // I find in this foreach which keys represents my validations types in the csv.
     foreach ($map_validations as $validate_name => $headers) {
       // Execute this regex to delete all special chars of string, I will use this string to call a method of the class
@@ -53,42 +57,15 @@ class Validator {
             $invalid_lines[$key][$header][strtoupper($result['type'])]['type error'] = $result['type_error'];
             $invalid_lines[$key][$header][strtoupper($result['type'])]['msg'] = $result['msg'];
           }
+          else {
+            // Case needs to fix a problem I send again the value to the $data
+            $data[$key][$header] = $result['value'];
+          }
         }
       }
     }
     array_unshift($data, $first_line);
     return $invalid_lines;
-  }
-
-  /**
-   * @param  array  $invalid_lines Invalid returned of the $this->fileValidate
-   * @param  array  $data Contains excel's file all line
-   * @return array  $invalid_lines Revisioned
-   */
-  private function fixInvalidLines(array &$data) {
-    $invalid_lines = $this->invalid_lines;
-    foreach ($invalid_lines as $line_key => $headers) {
-      foreach ($headers as $header => $line_error) {
-        foreach ($line_error as $type => $key) {
-          if ($type == 'CPF' && $key['type error'] == 'zeros missing') {
-            $new_cpf = $this->completeWithZero($data[$line_key][$header],11);
-            // if continue with problem we need to alert the user
-            if(br_tax_number_cpf_validator($new_cpf)) {
-              $data[$line_key][$header] = $new_cpf;
-              // Fixed problem We can delete this register
-              unset($invalid_lines[$line_key][$header][$type]);
-            }
-          }
-
-          if ($type == 'CNPJ' && $key['type error'] == 'zeros missing') {
-            $data[$line_key][$header] = $this->completeWithZero($data[$line_key][$header],14);
-            // Fixed problem We can delete this register
-            unset($invalid_lines[$line_key][$header][$type]);
-          }
-        }
-      }
-    }
-    $this->invalid_lines = $invalid_lines;
   }
 
   public function formatInvalidLinesToSimpleArray() {
@@ -97,7 +74,7 @@ class Validator {
       foreach ($columns_error as $column_error => $validators) {
         foreach ($validators as $key => $result) {
           // Added plus one in the line error because we need consider the header
-          $errors[] = sprintf('%u, %s, %s', $line_error + 1, $column_error, $result['msg']);
+          $errors[] = sprintf('%u, %s, %s', $line_error + 2, $column_error, $result['msg']);
         }
       }
     }

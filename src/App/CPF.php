@@ -2,15 +2,17 @@
 namespace App;
 
 class CPF {
+  private $utils;
+
+  public function __construct() {
+    $this->utils = new Utils();
+  }
 
   public function validate($value) {
+
+    // Check if this value contains 11 digits
     if (strlen((string) $value) < 11) {
-      return array(
-        'status' => FALSE,
-        'type' => 'cpf',
-        'type_error' => 'zeros missing',
-        'msg' => sprintf('Foi executado uma tentativa de corrigir o CPF adicionando zeros a frente porém sem sucesso. O CPF continuou inválido. Por favor efetue a correção.'),
-      );
+      $value = $this->utils->completeWithZero($value, 11);
     }
 
     if(!$this->cpfValidator($value)) {
@@ -24,6 +26,7 @@ class CPF {
 
     return array(
       'status' => TRUE,
+      'value' => $value,
     );
   }
 
@@ -81,7 +84,10 @@ class CPF {
       // retona true se os dois últimos dígitos do cpf
       // forem igual a concatenação de $d1 e $d2 e se não
       // deve retornar false.
-      return (substr($cpf, -2) == $d1 . $d2) ? true : false;
+      if (false !== stripos(substr($cpf, -2), $d1 . $d2)) {
+        return TRUE;
+      }
+      return FALSE;
     }
   }
 }

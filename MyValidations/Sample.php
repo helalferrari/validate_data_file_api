@@ -33,9 +33,9 @@ class Sample extends InitValidator{
         'Name',
         'E-mail',
       ),
-      'not repeat' => array(
-        'E-mail',
-      ),
+      // 'not repeat' => array(
+      //   'E-mail',
+      // ),
     ));
   }
 }
