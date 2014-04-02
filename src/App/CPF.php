@@ -10,6 +10,8 @@ class CPF {
 
   public function validate($value) {
 
+    $value = preg_replace("/[^0-9]/", "", $value);
+
     // Check if this value contains 11 digits
     if (strlen((string) $value) < 11) {
       $value = $this->utils->completeWithZero($value, 11);
@@ -35,8 +37,7 @@ class CPF {
     // pra manter o respeito ;)
     $d1 = 0;
     $d2 = 0;
-    // remove tudo que não seja número
-    $cpf = preg_replace("/[^0-9]/", "", $cpf);
+
     // lista de cpf inválidos que serão ignorados
     $ignore_list = array(
       '00000000000',

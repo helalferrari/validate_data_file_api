@@ -13,6 +13,8 @@ class CNPJ {
    */
   public function validate($value) {
 
+    $value = preg_replace("/[^0-9]/", "", $value);
+
     // Check if this value contains 14 digits
     if (strlen((string) $value) < 14) {
       $value = $this->utils->completeWithZero($value, 14);
@@ -34,10 +36,6 @@ class CNPJ {
   }
 
   private function cnpjValidator($cnpj) {
-    $cnpj     = preg_replace('/[^0-9]/', '', $cnpj);
-    if(strlen($cnpj) <> 14){
-        return false;
-    }
 
     $ignore_list = array(
       '00000000000000',
