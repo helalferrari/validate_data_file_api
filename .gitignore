@@ -1,0 +1,3 @@
+# Ignore paths that contain composer-generated content.i
+composer.lock
+vendor

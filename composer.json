@@ -1,7 +1,7 @@
 {
     "name": "helalferrari/validate_data_file_api",
     "description": "API to validate documents to migration",
-    "license": "GPL",
+    "license": "GPL-2.0+",
     "authors": [
         {
             "name": "Helal Ferrari",
